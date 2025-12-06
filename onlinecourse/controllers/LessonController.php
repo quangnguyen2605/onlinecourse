@@ -150,57 +150,14 @@ class LessonController
                         'file_path' => $targetPath,
                         'file_type' => pathinfo($name, PATHINFO_EXTENSION),
                     ]);
-                    $_SESSION['success'] = 'Tải tài liệu thành công!';
-                } else {
-                    $_SESSION['error'] = 'Không thể tải tài liệu';
                 }
-            } else {
-                $_SESSION['error'] = 'Vui lòng chọn file để tải lên';
             }
 
-            header('Location: index.php?controller=Lesson&action=manageMaterials&lesson_id=' . $lessonId);
+            header('Location: index.php?controller=Lesson&action=view&id=' . $lessonId);
             exit;
         }
 
-        $pageTitle = 'Tải tài liệu lên';
+        $pageTitle = 'Upload tài liệu';
         require __DIR__ . '/../views/instructor/materials/upload.php';
-    }
-
-    public function manageMaterials()
-    {
-        $this->requireInstructor();
-        $lessonId = isset($_GET['lesson_id']) ? (int)$_GET['lesson_id'] : 0;
-        
-        $lessonModel = new Lesson();
-        $materialModel = new Material();
-        
-        $lesson = $lessonModel->findById($lessonId);
-        $materials = $materialModel->getByLesson($lessonId);
-        
-        $pageTitle = 'Quản lý tài liệu - ' . ($lesson['title'] ?? '');
-        require __DIR__ . '/../views/instructor/materials/manage.php';
-    }
-
-    public function deleteMaterial()
-    {
-        $this->requireInstructor();
-        $materialId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
-        $lessonId = isset($_GET['lesson_id']) ? (int)$_GET['lesson_id'] : 0;
-        
-        if ($materialId > 0) {
-            $materialModel = new Material();
-            $material = $materialModel->findById($materialId);
-            
-            // Delete file from filesystem
-            if ($material && file_exists($material['file_path'])) {
-                unlink($material['file_path']);
-            }
-            
-            $materialModel->delete($materialId);
-            $_SESSION['success'] = 'Xóa tài liệu thành công';
-        }
-        
-        header('Location: index.php?controller=Lesson&action=manageMaterials&lesson_id=' . $lessonId);
-        exit;
     }
 }

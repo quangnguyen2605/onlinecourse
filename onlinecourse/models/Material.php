@@ -29,30 +29,10 @@ class Material
         ]);
     }
 
-    public function getByCourse($courseId)
-    {
-        $sql = 'SELECT m.*, l.title as lesson_title 
-                FROM materials m 
-                JOIN lessons l ON m.lesson_id = l.id 
-                WHERE l.course_id = :course_id 
-                ORDER BY l.order, m.uploaded_at';
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([':course_id' => $courseId]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
     public function delete($id)
     {
         $sql = 'DELETE FROM materials WHERE id = :id';
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([':id' => $id]);
-    }
-
-    public function findById($id)
-    {
-        $sql = 'SELECT * FROM materials WHERE id = :id LIMIT 1';
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([':id' => $id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 }

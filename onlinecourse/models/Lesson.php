@@ -57,40 +57,4 @@ class Lesson
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([':id' => $id]);
     }
-
-    public function markCompleted($lessonId, $studentId)
-    {
-        $sql = 'INSERT INTO lesson_progress (lesson_id, student_id, completed_at) 
-                VALUES (:lesson_id, :student_id, NOW())
-                ON DUPLICATE KEY UPDATE completed_at = NOW()';
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([
-            ':lesson_id' => $lessonId,
-            ':student_id' => $studentId,
-        ]);
-    }
-
-    public function getCompletedByStudent($courseId, $studentId)
-    {
-        $sql = 'SELECT l.* FROM lessons l 
-                JOIN lesson_progress lp ON l.id = lp.lesson_id 
-                WHERE l.course_id = :course_id AND lp.student_id = :student_id';
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([
-            ':course_id' => $courseId,
-            ':student_id' => $studentId,
-        ]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    public function isCompleted($lessonId, $studentId)
-    {
-        $sql = 'SELECT 1 FROM lesson_progress WHERE lesson_id = :lesson_id AND student_id = :student_id LIMIT 1';
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([
-            ':lesson_id' => $lessonId,
-            ':student_id' => $studentId,
-        ]);
-        return $stmt->fetchColumn() !== false;
-    }
 }

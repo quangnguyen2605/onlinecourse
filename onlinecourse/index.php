@@ -1,6 +1,9 @@
 <?php
 session_start();
 
+// Load config/Database.php first
+require_once __DIR__ . '/config/Database.php';
+
 spl_autoload_register(function ($class) {
     $paths = [
         __DIR__ . '/controllers/' . $class . '.php',
@@ -33,4 +36,16 @@ if (!method_exists($controller, $actionName)) {
     exit;
 }
 
-$controller->{$actionName}();
+// Handle route parameters
+$params = [];
+if (isset($_GET['id'])) $params['id'] = $_GET['id'];
+if (isset($_GET['courseId'])) $params['courseId'] = $_GET['courseId'];
+if (isset($_GET['lessonId'])) $params['lessonId'] = $_GET['lessonId'];
+if (isset($_GET['userId'])) $params['userId'] = $_GET['userId'];
+
+// Call the action with parameters
+if (!empty($params)) {
+    call_user_func_array([$controller, $actionName], array_values($params));
+} else {
+    $controller->{$actionName}();
+}

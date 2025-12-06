@@ -14,11 +14,10 @@ class CourseController
         $courseModel = new Course();
         $categoryModel = new Category();
 
-        $keyword = isset($_GET['keyword']) ? trim($_GET['keyword']) : '';
+        $keyword = isset($_GET['q']) ? trim($_GET['q']) : '';
         $categoryId = isset($_GET['category_id']) ? $_GET['category_id'] : null;
 
-        // Only show approved courses to general users
-        $courses = $courseModel->searchApproved($keyword, $categoryId);
+        $courses = $courseModel->search($keyword, $categoryId);
         $categories = $categoryModel->getAll();
 
         $pageTitle = 'Danh sách khóa học';
@@ -29,31 +28,16 @@ class CourseController
     {
         $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
         $courseModel = new Course();
-        $enrollmentModel = new Enrollment();
         $lessonModel = new Lesson();
-        $materialModel = new Material();
 
-        // Lấy thông tin khóa học với tên giảng viên và danh mục
-        $course = $courseModel->getCourseWithInstructor($id);
-        
+        $course = $courseModel->findById($id);
         if (!$course) {
-            $_SESSION['error'] = 'Khóa học không tồn tại';
-            header('Location: index.php?controller=Course&action=index');
-            exit;
+            http_response_code(404);
+            echo 'Khóa học không tồn tại';
+            return;
         }
 
-        // Kiểm tra xem người dùng đã đăng ký chưa
-        $isEnrolled = false;
-        if (isset($_SESSION['user_id'])) {
-            $isEnrolled = $enrollmentModel->isEnrolled($_SESSION['user_id'], $id);
-        }
-
-        // Lấy danh sách bài học
         $lessons = $lessonModel->getByCourse($id);
-        
-        // Lấy tài liệu cho khóa học
-        $materials = $materialModel->getByCourse($id);
-
         $pageTitle = $course['title'];
         require __DIR__ . '/../views/courses/detail.php';
     }

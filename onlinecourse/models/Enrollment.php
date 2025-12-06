@@ -39,14 +39,14 @@ class Enrollment
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function isEnrolled($studentId, $courseId)
+    public function updateProgress($courseId, $studentId, $progress)
     {
-        $sql = 'SELECT id FROM enrollments WHERE student_id = :student_id AND course_id = :course_id LIMIT 1';
+        $sql = 'UPDATE enrollments SET progress = :progress WHERE course_id = :course_id AND student_id = :student_id';
         $stmt = $this->db->prepare($sql);
-        $stmt->execute([
-            ':student_id' => $studentId,
+        return $stmt->execute([
+            ':progress' => (int)$progress,
             ':course_id' => $courseId,
+            ':student_id' => $studentId,
         ]);
-        return $stmt->fetch(PDO::FETCH_ASSOC) !== false;
     }
 }

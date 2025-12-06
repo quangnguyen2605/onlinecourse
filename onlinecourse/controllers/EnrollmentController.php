@@ -17,31 +17,10 @@ class EnrollmentController
 
         if ($courseId > 0) {
             $enrollmentModel = new Enrollment();
-            $courseModel = new Course();
-            
-            // Check if course exists
-            $course = $courseModel->findById($courseId);
-            if (!$course) {
-                $_SESSION['error'] = 'Khóa học không tồn tại';
-                header('Location: index.php?controller=Course&action=index');
-                exit;
-            }
-            
-            // Check if already enrolled
-            $existing = $enrollmentModel->getOne($courseId, $studentId);
-            if ($existing) {
-                $_SESSION['error'] = 'Bạn đã đăng ký khóa học này rồi';
-            } else {
-                $enrolled = $enrollmentModel->enroll($courseId, $studentId);
-                if ($enrolled) {
-                    $_SESSION['success'] = 'Đăng ký khóa học thành công!';
-                } else {
-                    $_SESSION['error'] = 'Không thể đăng ký khóa học';
-                }
-            }
+            $enrollmentModel->enroll($courseId, $studentId);
         }
 
-        header('Location: index.php?controller=Course&action=detail&id=' . $courseId);
+        header('Location: index.php?controller=Enrollment&action=myCourses');
         exit;
     }
 
@@ -78,61 +57,5 @@ class EnrollmentController
 
         $pageTitle = 'Tiến độ khóa học - ' . $course['title'];
         require __DIR__ . '/../views/student/course_progress.php';
-    }
-
-    public function viewLesson()
-    {
-        $this->requireLogin();
-        $lessonId = isset($_GET['lesson_id']) ? (int)$_GET['lesson_id'] : 0;
-        $studentId = (int)$_SESSION['user_id'];
-
-        $lessonModel = new Lesson();
-        $enrollmentModel = new Enrollment();
-        $materialModel = new Material();
-
-        $lesson = $lessonModel->findById($lessonId);
-        if (!$lesson) {
-            http_response_code(404);
-            echo 'Bài học không tồn tại';
-            return;
-        }
-
-        // Check if student is enrolled in the course
-        $enrollment = $enrollmentModel->getOne($lesson['course_id'], $studentId);
-        if (!$enrollment) {
-            http_response_code(403);
-            echo 'Bạn chưa đăng ký khóa học này';
-            return;
-        }
-
-        $materials = $materialModel->getByLesson($lessonId);
-        $pageTitle = $lesson['title'];
-        require __DIR__ . '/../views/student/lesson_view.php';
-    }
-
-    public function markLessonComplete()
-    {
-        $this->requireLogin();
-        $lessonId = isset($_POST['lesson_id']) ? (int)$_POST['lesson_id'] : 0;
-        $courseId = isset($_POST['course_id']) ? (int)$_POST['course_id'] : 0;
-        $studentId = (int)$_SESSION['user_id'];
-
-        if ($lessonId > 0 && $courseId > 0) {
-            $enrollmentModel = new Enrollment();
-            $lessonModel = new Lesson();
-            
-            // Mark lesson as completed
-            $lessonModel->markCompleted($lessonId, $studentId);
-            
-            // Update overall progress
-            $lessons = $lessonModel->getByCourse($courseId);
-            $completedLessons = $lessonModel->getCompletedByStudent($courseId, $studentId);
-            $progress = count($lessons) > 0 ? (count($completedLessons) / count($lessons)) * 100 : 0;
-            
-            $enrollmentModel->updateProgress($courseId, $studentId, $progress);
-        }
-
-        header('Location: index.php?controller=Enrollment&action=progress&course_id=' . $courseId);
-        exit;
     }
 }
