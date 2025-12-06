@@ -1,3 +1,8 @@
+<?php 
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+?>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -12,14 +17,13 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/BTLCNWEB/onlinecourse/assets/css/style.css">
 </head>
 <body>
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
         <div class="container">
-            <a class="navbar-brand fw-bold text-primary" href="/BTLCNWEB/onlinecourse/">
-                <i class="fas fa-code"></i> OnlineCourse
+            <a class="navbar-brand fw-bold text-primary" href="/onlinecourse/onlinecourse/views/coursera/index.php">
+                <i class="fas fa-graduation-cap"></i> OnlineCourse
             </a>
             
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -29,7 +33,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/BTLCNWEB/onlinecourse/">Trang chủ</a>
+                        <a class="nav-link" href="/onlinecourse/onlinecourse/views/coursera/index.php">Trang chủ</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="index.php?controller=Course&action=index">Khóa học</a>
@@ -70,8 +74,8 @@
                                 <?= htmlspecialchars($_SESSION['user_fullname'] ?? 'User') ?>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-user"></i> Hồ sơ</a></li>
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-cog"></i> Cài đặt</a></li>
+                                <li><a class="dropdown-item" href="auth/profile.php"><i class="fas fa-user"></i> Hồ sơ cá nhân</a></li>
+                                <li><a class="dropdown-item" href="auth/profile.php#password-tab"><i class="fas fa-key"></i> Đổi mật khẩu</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="index.php?controller=Auth&action=logout">
                                     <i class="fas fa-sign-out-alt"></i> Đăng xuất
